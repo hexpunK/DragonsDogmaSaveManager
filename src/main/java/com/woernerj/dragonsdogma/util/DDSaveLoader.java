@@ -62,14 +62,8 @@ public class DDSaveLoader {
 		
 		if (readBytes < length) return null;
 		
-		for (int i = 0; i < 8; i++) {
-			System.out.printf("0x%02X\n",compressedData[i]);
-		}
+		byte[] uncompressed = CompressionUtils.decompress(compressedData);
 		
-		byte[] uncompressed = CompressionUtils.decompress(compressedData, header.getSize());
-		for (int i = 0; i < 8; i++) {
-			System.out.printf("0x%02X\n",uncompressed[i]);
-		}
 		return null;
 	}
 }

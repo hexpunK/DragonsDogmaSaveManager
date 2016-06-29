@@ -20,6 +20,8 @@ public class CompressionUtils {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream(raw.length)){
 			byte[] buffer = new byte[1024];
 			while (!deflater.finished()) {
+				double perc = (deflater.getBytesRead())/(double)raw.length;
+				System.out.printf("%.3f\r",perc);
 				out.write(buffer, 0, deflater.deflate(buffer));
 			}
 			return out.toByteArray();
@@ -31,29 +33,19 @@ public class CompressionUtils {
 	}
 	
 	public static byte[] decompress(final byte[] compressed) {
-		return decompress(compressed, null);
-	}
-	
-	public static byte[] decompress(final byte[] compressed, Integer expectedSize) {
 		if (ArrayUtils.isEmpty(compressed)) return new byte[0];
-		if (expectedSize == null) expectedSize = 0;
 		
 		Inflater inflater = new Inflater();
 		inflater.setInput(compressed);
 		
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream(compressed.length)){
 			byte[] buffer = new byte[1024];
-			Integer done = 0;
-			System.out.println(expectedSize);
-			while (!inflater.finished()) {
-				Integer len = inflater.inflate(buffer);
-				done += len;
-				if (expectedSize > 0) {
-					float perc = (float)done/(float)expectedSize;
-					System.out.printf("%.2f    \r", perc);
-				}
-				out.write(buffer, 0, len);
+			while (inflater.getRemaining() > 0) {
+				double perc = inflater.getBytesRead()/(double)compressed.length;
+				System.out.printf("%.3f\r",perc);
+				out.write(buffer, 0, inflater.inflate(buffer));
 			}
+			inflater.end();
 			return out.toByteArray();
 		} catch (DataFormatException | IOException e) {
 			System.err.println("Decompression failed! Returning the compressed data...");
