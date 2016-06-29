@@ -20,17 +20,29 @@ public class DDSaveLoader {
 			1079398965
 	};
 	
-	public DDSave load(InputStream saveStream) throws IOException, DataFormatException {
-		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
-		DDSave save = parseSave(header, saveStream);
-		return save;
+	public DDSaveHeader loadHeader(InputStream saveStream) {
+		return parseHeader(new DataInputStream(saveStream));
 	}
 	
-	private DDSaveHeader parseHeader(DataInput saveStream) throws IOException {
+	public DDSave loadSave(InputStream saveStream) {
+		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
+		return new DDSave();
+	}
+	
+	public String loadSaveAsXml(InputStream saveStream) {
+		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
+		return new String(parseSave(header, saveStream));
+	}
+	
+	private DDSaveHeader parseHeader(DataInput saveStream) {
 		ByteBuffer buffer = ByteBuffer.allocate(DDSaveHeader.HEADER_BYTES);
 		byte[] data = new byte[DDSaveHeader.HEADER_BYTES];
 		
-		saveStream.readFully(data);
+		try {
+			saveStream.readFully(data);
+		} catch (IOException e) {
+			return null;
+		}
 		
 		buffer.order(DDSaveHeader.ENDIANNESS).put(data).flip();
 		
@@ -55,15 +67,18 @@ public class DDSaveLoader {
 		return header;
 	}
 	
-	private DDSave parseSave(DDSaveHeader header, InputStream saveStream) throws IOException, DataFormatException {
+	private byte[] parseSave(DDSaveHeader header, InputStream saveStream) {
 		byte[] compressedData = new byte[header.getCompressedSize()];
 		Integer length = header.getCompressedSize() - DDSaveHeader.HEADER_BYTES;
-		Integer readBytes = saveStream.read(compressedData, 0, length);
+		Integer readBytes = -1;
+		try {
+			readBytes = saveStream.read(compressedData, 0, length);
+		} catch (IOException e) {
+			return null;
+		}
 		
-		if (readBytes < length) return null;
+		if (readBytes < 0) return null;
 		
-		byte[] uncompressed = CompressionUtils.decompress(compressedData);
-		
-		return null;
+		return CompressionUtils.decompress(compressedData);
 	}
 }

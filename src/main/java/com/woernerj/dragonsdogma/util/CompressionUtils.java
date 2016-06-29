@@ -26,9 +26,7 @@ public class CompressionUtils {
 			}
 			return out.toByteArray();
 		} catch (IOException e) {
-			System.err.println("Compression failed! Returning the raw data...");
-			e.printStackTrace();
-			return raw;
+			return null;
 		}
 	}
 	
@@ -48,9 +46,7 @@ public class CompressionUtils {
 			inflater.end();
 			return out.toByteArray();
 		} catch (DataFormatException | IOException e) {
-			System.err.println("Decompression failed! Returning the compressed data...");
-			e.printStackTrace();
-			return compressed;
+			return null;
 		}
 	}
 }
