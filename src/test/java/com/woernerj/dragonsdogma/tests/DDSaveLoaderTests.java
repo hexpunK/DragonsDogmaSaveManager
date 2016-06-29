@@ -29,8 +29,6 @@ public class DDSaveLoaderTests {
 		File file = new File(this.getClass().getClassLoader().getResource("ddda.sav").getFile());
 		FileInputStream input = new FileInputStream(file);
 		
-		new DDSaveLoader().load(input);
-		
 		DDSaveHeader result = (DDSaveHeader)method.invoke(new DDSaveLoader(), new DataInputStream(input));
 		
 		assertNotNull(result);
