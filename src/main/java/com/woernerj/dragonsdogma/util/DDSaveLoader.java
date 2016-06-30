@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.zip.DataFormatException;
 
 import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
@@ -26,6 +25,7 @@ public class DDSaveLoader {
 	
 	public DDSave loadSave(InputStream saveStream) {
 		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
+		parseSave(header, saveStream);
 		return new DDSave();
 	}
 	

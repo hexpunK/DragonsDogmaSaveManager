@@ -4,13 +4,13 @@ import java.nio.ByteOrder;
 
 public class DDSaveHeader {
 
+	public static final Integer HEADER_BYTES = 32;
+	public static final ByteOrder ENDIANNESS = ByteOrder.LITTLE_ENDIAN;
+	
 	private Integer version;
 	private Integer size;
 	private Integer compressedSize;
 	private Integer checksum;
-
-	public static final Integer HEADER_BYTES = 32;
-	public static final ByteOrder ENDIANNESS = ByteOrder.LITTLE_ENDIAN;
 
 	public DDSaveHeader() {
 		this.version = 0;
