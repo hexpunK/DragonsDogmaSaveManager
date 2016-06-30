@@ -1,5 +1,5 @@
 package com.woernerj.dragonsdogma.bo.types;
 
-public class U64 extends SimpleType<Long> {
+import java.math.BigDecimal;
 
-}
+public class U64 extends CastingType<Long, BigDecimal> { }

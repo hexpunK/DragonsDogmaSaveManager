@@ -1,5 +1,3 @@
 package com.woernerj.dragonsdogma.bo.types;
 
-public class Bool extends SimpleType<Boolean> {
-
-}
+public class Bool extends CastingType<Boolean, Boolean> { }

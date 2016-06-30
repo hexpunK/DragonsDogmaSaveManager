@@ -1,5 +1,3 @@
 package com.woernerj.dragonsdogma.bo.types;
 
-public class String extends SimpleType<String> {
-
-}
+public class String extends CastingType<String, String> { }
