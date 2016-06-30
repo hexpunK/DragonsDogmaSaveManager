@@ -69,7 +69,7 @@ public class DDSaveLoader {
 	
 	private byte[] parseSave(DDSaveHeader header, InputStream saveStream) {
 		byte[] compressedData = new byte[header.getCompressedSize()];
-		Integer length = header.getCompressedSize() - DDSaveHeader.HEADER_BYTES;
+		Integer length = header.getCompressedSize();
 		Integer readBytes = -1;
 		try {
 			readBytes = saveStream.read(compressedData, 0, length);

@@ -39,8 +39,8 @@ public class CompressionUtils {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream(compressed.length)){
 			byte[] buffer = new byte[1024];
 			while (inflater.getRemaining() > 0) {
-				double perc = inflater.getBytesRead()/(double)compressed.length;
-				System.out.printf("%.3f\r",perc);
+				float perc = inflater.getBytesRead()/(float)compressed.length;
+				System.out.printf("%f\r",perc);
 				out.write(buffer, 0, inflater.inflate(buffer));
 			}
 			inflater.end();
