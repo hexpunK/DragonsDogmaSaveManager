@@ -2,7 +2,7 @@ package com.woernerj.dragonsdogma.bo.types.xml;
 
 import java.math.BigDecimal;
 
-public class U64 extends CastingType<Long, BigDecimal> {
+public class U64 extends NumberType<Long, BigDecimal> {
 	
 	@Override
 	public BigDecimal getValue() {

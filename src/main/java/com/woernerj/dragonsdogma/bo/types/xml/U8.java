@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class U8 extends CastingType<Byte, Short> {
+public class U8 extends NumberType<Byte, Short> {
 	
 	@Override
 	public Short getValue() {

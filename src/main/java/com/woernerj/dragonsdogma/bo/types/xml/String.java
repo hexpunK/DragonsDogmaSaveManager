@@ -1,13 +1,13 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class String extends CastingType<String, String> {
+public class String extends NamedType {
 
-	@Override
-	public String getMinValue() {
-		return null;
+	private String value;
+	
+	public String getValue() {
+		return this.value;
 	}
-	@Override
-	public String getMaxValue() {
-		return null;
+	public void setValue(String value) {
+		this.value = value;
 	}
 }

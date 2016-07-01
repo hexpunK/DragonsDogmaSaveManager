@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class S16 extends CastingType<Short, Short> {
+public class S16 extends NumberType<Short, Short> {
 
 	@Override
 	public Short getMinValue() {

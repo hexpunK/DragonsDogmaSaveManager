@@ -1,13 +1,13 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class Bool extends CastingType<Boolean, Boolean> {
+public class Bool extends NamedType {
 	
-	@Override
-	public Boolean getMinValue() {
-		return Boolean.FALSE;
-	}	
-	@Override
-	public Boolean getMaxValue() {
-		return Boolean.TRUE;
+	private Boolean value;
+	
+	public Boolean getValue() {
+		return this.value;
+	}
+	public void setValue(Boolean value) {
+		this.value = value;
 	}
 }

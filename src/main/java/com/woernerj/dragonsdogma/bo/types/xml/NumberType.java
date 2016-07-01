@@ -2,7 +2,7 @@ package com.woernerj.dragonsdogma.bo.types.xml;
 
 import net.jodah.typetools.TypeResolver;
 
-public abstract class CastingType<T, R> extends NamedType {
+public abstract class NumberType<T extends Number, R extends Number> extends NamedType {
 
 	protected T value;
 	
@@ -22,7 +22,7 @@ public abstract class CastingType<T, R> extends NamedType {
 	
 	@SuppressWarnings("unchecked")
 	private boolean isSameType() {
-		java.lang.Class<?>[] classes = TypeResolver.resolveRawArguments(CastingType.class, getClass());
+		java.lang.Class<?>[] classes = TypeResolver.resolveRawArguments(NumberType.class, getClass());
 		java.lang.Class<T> left = (java.lang.Class<T>)classes[0];
 		java.lang.Class<R> right = (java.lang.Class<R>)classes[1];
 		

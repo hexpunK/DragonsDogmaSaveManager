@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class S8 extends CastingType<Byte, Byte> {
+public class S8 extends NumberType<Byte, Byte> {
 
 	@Override
 	public Byte getMinValue() {

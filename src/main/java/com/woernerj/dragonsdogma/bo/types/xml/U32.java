@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class U32 extends CastingType<Integer, Long> {
+public class U32 extends NumberType<Integer, Long> {
 
 	@Override
 	public Long getValue() {

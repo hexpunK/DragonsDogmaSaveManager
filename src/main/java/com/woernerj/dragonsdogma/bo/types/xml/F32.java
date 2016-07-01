@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class F32 extends CastingType<Float, Float> {
+public class F32 extends NumberType<Float, Float> {
 
 	@Override
 	public Float getMinValue() {
