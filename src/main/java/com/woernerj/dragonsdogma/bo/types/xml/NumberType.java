@@ -40,6 +40,9 @@ public abstract class NumberType<T extends Number, R extends Number> extends Nam
 		if (val == null) {
 			val = (R)Integer.valueOf(0);
 		}
-		return java.lang.String.format("<%s name=\"%s\" value=\"%s\" />", getClass().getSimpleName().toLowerCase(), getName(), val);
+		if (getName() == null) {
+			return java.lang.String.format("<%s value=\"%s\"/>", getClass().getSimpleName().toLowerCase(), val);
+		}
+		return java.lang.String.format("<%s name=\"%s\" value=\"%s\"/>", getClass().getSimpleName().toLowerCase(), getName(), val);
 	}
 }

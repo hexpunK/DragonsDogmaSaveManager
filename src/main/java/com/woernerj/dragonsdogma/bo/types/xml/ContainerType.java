@@ -2,14 +2,14 @@ package com.woernerj.dragonsdogma.bo.types.xml;
 
 import java.util.List;
 
-public abstract class ContainerType extends NamedType {
+public abstract class ContainerType<T> extends NamedType {
 
-	private List<? extends NamedType> children;
+	private List<T> children;
 	
-	public List<? extends NamedType> getChildren() {
+	public List<T> getChildren() {
 		return this.children;
 	}
-	public void setChildren(List<? extends NamedType> children) {
+	public void setChildren(List<T> children) {
 		this.children = children;
 	}
 }

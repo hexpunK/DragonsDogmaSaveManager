@@ -13,6 +13,6 @@ public class F32 extends NumberType<Float, Float> {
 	
 	@Override
 	public java.lang.String getXmlString() {
-		return java.lang.String.format("<f32 name=\"%s\" value=\"%.6f\" />", getName(), getValue());
+		return java.lang.String.format("<f32 name=\"%s\" value=\"%.6f\"/>", getName(), getValue());
 	}
 }

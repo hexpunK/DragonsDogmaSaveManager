@@ -28,7 +28,7 @@ public class Vector3 extends NamedType {
 	@Override
 	public java.lang.String getXmlString() {
 		return java.lang.String.format(
-			"<vector3 name=\"%s\" x=\"%s\" y=\"%s\" z=\"%s\" />",
+			"<vector3 name=\"%s\" x=\"%s\" y=\"%s\" z=\"%s\"/>",
 			getName(), this.x, this.y, this.z);
 	}
 }

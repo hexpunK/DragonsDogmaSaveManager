@@ -63,7 +63,7 @@ public class NumberTypeTest {
 	}
 
 	@Test
-	public void testUnsignedInteger() {
+	public void testUnsignedInteger() throws Exception {
 		testCastingTypeInstance(new U32(), 0L, 4294967295L, -1L);
 	}
 

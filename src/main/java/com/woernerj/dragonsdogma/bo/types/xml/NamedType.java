@@ -12,4 +12,9 @@ public abstract class NamedType {
 	}
 	
 	public abstract java.lang.String getXmlString();
+	
+	@Override
+	public java.lang.String toString() {
+		return getXmlString();
+	}
 }

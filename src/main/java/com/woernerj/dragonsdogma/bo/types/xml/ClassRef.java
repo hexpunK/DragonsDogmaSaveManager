@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class ClassRef extends ContainerType {
+public class ClassRef extends ContainerType<NamedType> {
 
 	private String type;
 	
@@ -13,7 +13,13 @@ public class ClassRef extends ContainerType {
 	
 	@Override
 	public java.lang.String getXmlString() {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuffer sb = new StringBuffer();
+		sb.append(java.lang.String.format("<classref type=\"%s\">\n", this.type));
+		for (NamedType child : getChildren()) {
+			sb.append(child.getXmlString());
+			sb.append("\n");
+		}
+		sb.append("</classref>");		
+		return sb.toString();
 	}
 }

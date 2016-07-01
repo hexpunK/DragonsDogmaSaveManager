@@ -13,6 +13,6 @@ public class Bool extends NamedType {
 	
 	@Override
 	public java.lang.String getXmlString() {
-		return java.lang.String.format("<bool name=\"%s\" value=\"%s\" />", getName(), value);
+		return java.lang.String.format("<bool name=\"%s\" value=\"%s\"/>", getName(), value);
 	}
 }

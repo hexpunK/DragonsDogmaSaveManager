@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class Class extends ContainerType {
+public class Class extends ContainerType<NamedType> {
 
 	private String type;
 	
