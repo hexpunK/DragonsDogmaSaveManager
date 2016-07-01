@@ -1,4 +1,4 @@
-package com.woernerj.dragonsdogma.util;
+package com.woernerj.dragonsdogma.bo;
 
 public interface CompressionProgressCallback {
 

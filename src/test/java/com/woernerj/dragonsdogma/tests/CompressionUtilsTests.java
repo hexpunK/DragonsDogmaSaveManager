@@ -15,11 +15,11 @@ public class CompressionUtilsTests {
 	public void testCompressionUtils() throws UnsupportedEncodingException {
 		String inputStr = "Hello World!";
 		byte[] inputBytes = inputStr.getBytes("UTF-8");
-		
+
 		byte[] compressedBytes = CompressionUtils.compress(inputBytes);
-		assertNotEquals(0, compressedBytes.length);
-		
+		assertNotEquals("No compressed bytes returned", 0, compressedBytes.length);
+
 		byte[] decompressedBytes = CompressionUtils.decompress(compressedBytes);
-		assertArrayEquals(inputBytes, decompressedBytes);
+		assertArrayEquals("Decompressed byte count differs", inputBytes, decompressedBytes);
 	}
 }

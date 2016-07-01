@@ -1,4 +1,4 @@
-package com.woernerj.dragonsdogma.bo.types;
+package com.woernerj.dragonsdogma.bo.types.xml;
 
 public class Class extends ContainerType {
 

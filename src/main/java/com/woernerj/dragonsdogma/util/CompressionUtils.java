@@ -8,6 +8,8 @@ import java.util.zip.Inflater;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.woernerj.dragonsdogma.bo.CompressionProgressCallback;
+
 public class CompressionUtils {
 
 	public static byte[] compress(final byte[] raw) {
@@ -27,6 +29,7 @@ public class CompressionUtils {
 				out.write(buffer, 0, deflater.deflate(buffer));
 				callback.update(perc);
 			}
+			deflater.end();
 			return out.toByteArray();
 		} catch (IOException e) {
 			return null;

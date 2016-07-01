@@ -1,0 +1,13 @@
+package com.woernerj.dragonsdogma.bo.types.xml;
+
+public class S32 extends CastingType<Integer, Integer> {
+
+	@Override
+	public Integer getMinValue() {
+		return Integer.MIN_VALUE;
+	}
+	@Override
+	public Integer getMaxValue() {
+		return Integer.MAX_VALUE;
+	}
+}

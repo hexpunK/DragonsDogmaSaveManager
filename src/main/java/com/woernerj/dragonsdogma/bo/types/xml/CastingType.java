@@ -1,4 +1,4 @@
-package com.woernerj.dragonsdogma.bo.types;
+package com.woernerj.dragonsdogma.bo.types.xml;
 
 import net.jodah.typetools.TypeResolver;
 
@@ -28,4 +28,8 @@ public abstract class CastingType<T, R> extends NamedType {
 		
 		return left.equals(right);
 	}
+	
+	public abstract R getMinValue();
+	
+	public abstract R getMaxValue();
 }
