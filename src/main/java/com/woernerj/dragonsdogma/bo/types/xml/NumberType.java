@@ -32,4 +32,14 @@ public abstract class NumberType<T extends Number, R extends Number> extends Nam
 	public abstract R getMinValue();
 	
 	public abstract R getMaxValue();
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public java.lang.String getXmlString() {
+		R val = getValue();
+		if (val == null) {
+			val = (R)Integer.valueOf(0);
+		}
+		return java.lang.String.format("<%s name=\"%s\" value=\"%s\" />", getClass().getSimpleName().toLowerCase(), getName(), val);
+	}
 }

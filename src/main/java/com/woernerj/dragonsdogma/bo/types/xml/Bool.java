@@ -10,4 +10,9 @@ public class Bool extends NamedType {
 	public void setValue(Boolean value) {
 		this.value = value;
 	}
+	
+	@Override
+	public java.lang.String getXmlString() {
+		return java.lang.String.format("<bool name=\"%s\" value=\"%s\" />", getName(), value);
+	}
 }

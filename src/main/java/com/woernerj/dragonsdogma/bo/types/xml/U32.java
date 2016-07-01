@@ -4,6 +4,7 @@ public class U32 extends NumberType<Integer, Long> {
 
 	@Override
 	public Long getValue() {
+		if (this.value == null) return null;
 		return (long)(this.value & 0x00000000FFFFFFFFL); 
 	}
 	@Override

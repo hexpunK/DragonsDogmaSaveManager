@@ -10,4 +10,10 @@ public class ClassRef extends ContainerType {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	@Override
+	public java.lang.String getXmlString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

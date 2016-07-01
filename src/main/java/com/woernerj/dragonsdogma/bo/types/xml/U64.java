@@ -6,6 +6,7 @@ public class U64 extends NumberType<Long, BigDecimal> {
 	
 	@Override
 	public BigDecimal getValue() {
+		if (this.value == null) return null;
 		return new BigDecimal(Long.toUnsignedString(this.value));
 	}
 	@Override

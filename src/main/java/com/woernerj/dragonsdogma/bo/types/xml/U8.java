@@ -4,6 +4,7 @@ public class U8 extends NumberType<Byte, Short> {
 	
 	@Override
 	public Short getValue() {
+		if (this.value == null) return null;
 		return (short)(this.value & 0x00FF); 
 	}
 	@Override

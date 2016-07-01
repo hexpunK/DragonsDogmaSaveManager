@@ -10,4 +10,10 @@ public class String extends NamedType {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	@Override
+	public java.lang.String getXmlString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

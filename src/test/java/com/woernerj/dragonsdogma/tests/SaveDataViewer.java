@@ -56,11 +56,12 @@ public class SaveDataViewer extends JFrame {
 		
 		newTree.setToStringHandler(n -> {
 			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("(%s) ", node.getNodeName()));
 			for (int i = 0; i < attributes.getLength(); i++) {
 				Node attr = attributes.item(i);
 				sb.append(String.format("%s: %s", attr.getNodeName(), attr.getNodeValue()));
 				if (i < attributes.getLength()-1) {
-					sb.append("\t-\t");
+					sb.append(" - ");
 				}
 			}
 			return sb.toString();

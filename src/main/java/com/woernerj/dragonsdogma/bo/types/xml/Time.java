@@ -45,4 +45,11 @@ public class Time extends NamedType {
 	public void setSecond(Byte second) {
 		this.second = second;
 	}
+	
+	@Override
+	public java.lang.String getXmlString() {
+		return java.lang.String.format(
+			"<time name=\"%s\" year=\"%s\" month=\"%s\" day=\"%s\" hour=\"%s\" minute=\"%s\" second=\"%s\" />",
+			getName(), year, month, day, hour, minute, second);
+	}
 }

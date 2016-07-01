@@ -1,6 +1,6 @@
 package com.woernerj.dragonsdogma.bo;
 
-import com.woernerj.dragonsdogma.DDPlatform;
+import com.woernerj.dragonsdogma.bo.types.DDPlatform;
 
 public class DDSaveHeader {
 

@@ -7,9 +7,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import com.woernerj.dragonsdogma.DDPlatform;
 import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
+import com.woernerj.dragonsdogma.bo.types.DDPlatform;
 
 public class DDSaveLoader {
 

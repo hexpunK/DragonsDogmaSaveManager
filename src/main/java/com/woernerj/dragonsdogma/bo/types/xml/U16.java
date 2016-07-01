@@ -4,6 +4,7 @@ public class U16 extends NumberType<Short, Integer>{
 
 	@Override
 	public Integer getValue() {
+		if (this.value == null) return null;
 		return (this.value & 0x0000FFFF); 
 	}
 	@Override
