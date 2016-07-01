@@ -1,12 +1,12 @@
 package com.woernerj.dragonsdogma.bo;
 
-import java.nio.ByteOrder;
+import com.woernerj.dragonsdogma.DDPlatform;
 
 public class DDSaveHeader {
 
 	public static final Integer HEADER_BYTES = 32;
-	public static final ByteOrder ENDIANNESS = ByteOrder.LITTLE_ENDIAN;
 	
+	private DDPlatform platform;
 	private Integer version;
 	private Integer size;
 	private Integer compressedSize;
@@ -19,46 +19,46 @@ public class DDSaveHeader {
 		this.checksum = 0;
 	}
 
-	public DDSaveHeader(final Integer version, final Integer size,
-			final Integer compressedSize, final Integer checksum) {
+	public DDSaveHeader(final DDPlatform platform, final Integer version, 
+			final Integer size, final Integer compressedSize, 
+			final Integer checksum) {
+		this.platform = platform;
 		this.version = version;
 		this.size = size;
 		this.compressedSize = compressedSize;
 		this.checksum = checksum;
 	}
 
+	public DDPlatform getPlatform() {
+		return this.platform;
+	}
 	public Integer getVersion() {
 		return this.version;
-	}
-	
+	}	
 	public DDVersion getDDVersion() {
 		return DDVersion.parse(this.version);
 	}
-
 	public Integer getSize() {
 		return this.size;
 	}
-
 	public Integer getCompressedSize() {
 		return this.compressedSize;
 	}
-
 	public Integer getChecksum() {
 		return this.checksum;
 	}
-
+	public void setPlatform(DDPlatform platform) {
+		this.platform = platform;
+	}
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
-
 	public void setSize(Integer size) {
 		this.size = size;
 	}
-
 	public void setCompressedSize(Integer compressedSize) {
 		this.compressedSize = compressedSize;
 	}
-
 	public void setChecksum(Integer checksum) {
 		this.checksum = checksum;
 	}

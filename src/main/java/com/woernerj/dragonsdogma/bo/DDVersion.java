@@ -2,7 +2,8 @@ package com.woernerj.dragonsdogma.bo;
 
 public enum DDVersion {
 	DD(5),
-	DDDA(21);
+	DDDA(21)
+	;
 	
 	public final Integer VERSION;
 	

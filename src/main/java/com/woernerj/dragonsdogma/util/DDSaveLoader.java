@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import com.woernerj.dragonsdogma.DDPlatform;
 import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
 
@@ -44,7 +45,12 @@ public class DDSaveLoader {
 			return null;
 		}
 		
-		buffer.order(DDSaveHeader.ENDIANNESS).put(data).flip();
+		byte[] testByte = new byte[] {
+				data[15], data[14], data[13], data[12]
+		};
+		DDPlatform platform = DDPlatform.getPlatform(testByte);
+		
+		buffer.order(platform.endianness).put(data).flip();
 		
 		Integer version = buffer.getInt(0);
 		Integer size = buffer.getInt(4);
@@ -63,7 +69,7 @@ public class DDSaveLoader {
 			return null;
 		}
 		
-		DDSaveHeader header = new DDSaveHeader(version, size, compressedSize, checksum);
+		DDSaveHeader header = new DDSaveHeader(platform, version, size, compressedSize, checksum);
 		return header;
 	}
 	
