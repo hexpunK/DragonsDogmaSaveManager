@@ -2,6 +2,11 @@ package com.woernerj.dragonsdogma.bo.types;
 
 import java.util.Map;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.woernerj.dragonsdogma.util.XPathUtils;
+
 public class CharacterData {
 
 	private byte level;
@@ -123,5 +128,28 @@ public class CharacterData {
 	}
 	public void setGold(int gold) {
 		this.gold = gold;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Level %d - %s (%d)", this.getLevel(), this.getJob(), this.getJobLevel()[this.getJob()]);
+	}
+	
+	public static CharacterData build(Node root) {
+		Node characterDataNode = XPathUtils.findNode(root, "class[@name='mParam']");
+		byte level = XPathUtils.getDouble(characterDataNode, "u8[@name='mLevel']/@value").byteValue();
+		byte job = XPathUtils.getDouble(characterDataNode, "u8[@name='mJob']/@value").byteValue();
+		NodeList jobLevelNodes = XPathUtils.findNodes(characterDataNode, "array[@name='mJobLevel']/child::u8");
+		byte[] jobLevels = new byte[jobLevelNodes.getLength()];
+		for (int i = 0; i < jobLevels.length; i++) {
+			Node jobLevel = jobLevelNodes.item(i);
+			jobLevels[i] = XPathUtils.getDouble(jobLevel, "@value").byteValue();
+		}
+		
+		CharacterData obj = new CharacterData();
+		obj.setLevel(level);
+		obj.setJob(job);
+		obj.setJobLevel(jobLevels);
+		return obj;
 	}
 }

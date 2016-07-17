@@ -13,6 +13,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -22,6 +23,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
+import com.woernerj.dragonsdogma.bo.types.PlayerData;
 
 public class SaveDataViewer extends JFrame {
 	
@@ -76,7 +78,7 @@ public class SaveDataViewer extends JFrame {
 		return newTree;
 	}
 	
-	public static void main(String...args) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException {
+	public static void main(String...args) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException, XPathExpressionException {
 		File out = new File("output.xml");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -84,5 +86,8 @@ public class SaveDataViewer extends JFrame {
 		SwingUtilities.invokeLater(() -> {
 			new SaveDataViewer(document.getDocumentElement());
 		});
+
+		PlayerData d = PlayerData.build(document);
+		System.out.println(d);
 	}
 }
