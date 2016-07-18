@@ -1,18 +1,26 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.woernerj.dragonsdogma.bo.types.xml.adapters.NumberValueAdapter;
+
 import net.jodah.typetools.TypeResolver;
 
 public abstract class NumberType<T extends Number, R extends Number> extends NamedType {
 
 	protected T value;
 	
+	@XmlAttribute
+	@XmlJavaTypeAdapter(NumberValueAdapter.class)
 	@SuppressWarnings("unchecked")
 	public R getValue() {
 		if (isSameType()) {
 			return (R)this.value;
 		}
 		return null;
-	}	
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void setValue(R value) {
 		if (isSameType()) {
@@ -40,9 +48,9 @@ public abstract class NumberType<T extends Number, R extends Number> extends Nam
 		if (val == null) {
 			val = (R)Integer.valueOf(0);
 		}
-		if (getName() == null) {
+		if (name == null) {
 			return java.lang.String.format("<%s value=\"%s\"/>", getClass().getSimpleName().toLowerCase(), val);
 		}
-		return java.lang.String.format("<%s name=\"%s\" value=\"%s\"/>", getClass().getSimpleName().toLowerCase(), getName(), val);
+		return java.lang.String.format("<%s name=\"%s\" value=\"%s\"/>", getClass().getSimpleName().toLowerCase(), name, val);
 	}
 }

@@ -1,55 +1,31 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-public class Time extends NamedType {
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-	private Short year;
-	private Byte month;
-	private Byte day;
-	private Byte hour;
-	private Byte minute;
-	private Byte second;
+@XmlRootElement(name="time")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Time extends NamedType {
 	
-	public Short getYear() {
-		return year;
-	}
-	public Byte getMonth() {
-		return month;
-	}
-	public Byte getDay() {
-		return day;
-	}
-	public Byte getHour() {
-		return hour;
-	}
-	public Byte getMinute() {
-		return minute;
-	}
-	public Byte getSecond() {
-		return second;
-	}
-	public void setYear(Short year) {
-		this.year = year;
-	}
-	public void setMonth(Byte month) {
-		this.month = month;
-	}
-	public void setDay(Byte day) {
-		this.day = day;
-	}
-	public void setHour(Byte hour) {
-		this.hour = hour;
-	}
-	public void setMinute(Byte minute) {
-		this.minute = minute;
-	}
-	public void setSecond(Byte second) {
-		this.second = second;
-	}
+	@XmlAttribute
+	public Short year;
+	@XmlAttribute
+	public Byte month;
+	@XmlAttribute
+	public Byte day;
+	@XmlAttribute
+	public Byte hour;
+	@XmlAttribute
+	public Byte minute;
+	@XmlAttribute
+	public Byte second;
 	
 	@Override
 	public java.lang.String getXmlString() {
 		return java.lang.String.format(
 			"<time name=\"%s\" year=\"%s\" month=\"%s\" day=\"%s\" hour=\"%s\" minute=\"%s\" second=\"%s\"/>",
-			getName(), year, month, day, hour, minute, second);
+			name, year, month, day, hour, minute, second);
 	}
 }

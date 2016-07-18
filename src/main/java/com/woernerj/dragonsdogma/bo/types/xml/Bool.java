@@ -1,18 +1,19 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="bool")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Bool extends NamedType {
 	
-	private Boolean value;
-	
-	public Boolean getValue() {
-		return this.value;
-	}
-	public void setValue(Boolean value) {
-		this.value = value;
-	}
+	@XmlAttribute
+	public Boolean value;
 	
 	@Override
 	public java.lang.String getXmlString() {
-		return java.lang.String.format("<bool name=\"%s\" value=\"%s\"/>", getName(), value);
+		return java.lang.String.format("<bool name=\"%s\" value=\"%s\"/>", name, value);
 	}
 }

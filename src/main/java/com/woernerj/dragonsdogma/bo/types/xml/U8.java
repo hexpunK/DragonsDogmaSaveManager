@@ -1,5 +1,11 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="u8")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class U8 extends NumberType<Byte, Short> {
 	
 	@Override

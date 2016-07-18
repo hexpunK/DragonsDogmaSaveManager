@@ -1,34 +1,25 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="vector3")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Vector3 extends NamedType {
 
-	private Long x;
-	private Long y;
-	private Long z;
-	
-	public Long getX() {
-		return x;
-	}
-	public Long getY() {
-		return y;
-	}
-	public Long getZ() {
-		return z;
-	}
-	public void setX(Long x) {
-		this.x = x;
-	}
-	public void setY(Long y) {
-		this.y = y;
-	}
-	public void setZ(Long z) {
-		this.z = z;
-	}
+	@XmlAttribute
+	public Long x;
+	@XmlAttribute
+	public Long y;
+	@XmlAttribute
+	public Long z;
 	
 	@Override
 	public java.lang.String getXmlString() {
 		return java.lang.String.format(
 			"<vector3 name=\"%s\" x=\"%s\" y=\"%s\" z=\"%s\"/>",
-			getName(), this.x, this.y, this.z);
+			name, this.x, this.y, this.z);
 	}
 }

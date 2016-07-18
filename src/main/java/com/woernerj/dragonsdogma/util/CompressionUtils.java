@@ -69,8 +69,8 @@ public class CompressionUtils {
 	/**
 	 * Decompresses the specified data using the ZLib compression algorithm.
 	 * 
-	 * @param raw The data to be compressed as an array of bytes.
-	 * @return An array of bytes containing the decompresses data.
+	 * @param compressed The compressed data as an array of bytes.
+	 * @return An array of bytes containing the raw data.
 	 * @since 1.1
 	 */
 	public static byte[] decompress(final byte[] compressed) {
@@ -81,7 +81,7 @@ public class CompressionUtils {
 	 * Allows the specification of a callback to report the progress of the 
 	 * decompression operation. 
 	 * 
-	 * @param raw The compressed data as an array of bytes.
+	 * @param compressed The compressed data as an array of bytes.
 	 * @param callback A callback that will report the progress of the 
 	 * decompression operation as an implementation of {@link 
 	 * CompressionProgressCallback}.
