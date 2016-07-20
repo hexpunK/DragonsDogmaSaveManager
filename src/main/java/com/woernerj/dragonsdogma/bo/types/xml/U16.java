@@ -1,11 +1,8 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="u16")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class U16 extends NumberType<Short, Integer>{
 
 	@Override

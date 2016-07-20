@@ -7,7 +7,7 @@ public class TreeNode<T> {
 
 	private T item;
 	private List<TreeNode<?>> children;
-	private ToStringHandler toStringHandler;
+	private ToStringHandler<T> toStringHandler;
 	
 	public TreeNode(T item) {
 		this.item = item;
@@ -27,18 +27,18 @@ public class TreeNode<T> {
 		return this.children;
 	}
 	
-	public void setToStringHandler(ToStringHandler handler) {
+	public void setToStringHandler(ToStringHandler<T> handler) {
 		this.toStringHandler = handler;
 	}
 	
 	public String toString() {
-		if (item == null) return "NULL";
+		if (toStringHandler == null || item == null) return "NULL";
 		return toStringHandler.toString(item);
 	}
 	
 	@FunctionalInterface
-	public static interface ToStringHandler {
+	public static interface ToStringHandler<T> {
 		
-		public String toString(Object item);
+		public String toString(T item);
 	}
 }

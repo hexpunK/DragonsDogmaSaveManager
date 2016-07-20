@@ -1,11 +1,8 @@
 package com.woernerj.dragonsdogma.bo.types.xml;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="u32")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class U32 extends NumberType<Integer, Long> {
 
 	@Override

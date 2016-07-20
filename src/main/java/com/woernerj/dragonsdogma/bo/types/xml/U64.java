@@ -2,12 +2,9 @@ package com.woernerj.dragonsdogma.bo.types.xml;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="u64")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class U64 extends NumberType<Long, BigDecimal> {
 	
 	@Override

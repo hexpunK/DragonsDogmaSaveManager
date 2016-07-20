@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -16,27 +17,21 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
 import com.woernerj.dragonsdogma.bo.types.PlayerData;
+import com.woernerj.dragonsdogma.bo.types.xml.Array;
+import com.woernerj.dragonsdogma.bo.types.xml.Bool;
 import com.woernerj.dragonsdogma.bo.types.xml.ClassRef;
-import com.woernerj.dragonsdogma.bo.types.xml.F32;
-import com.woernerj.dragonsdogma.bo.types.xml.S16;
-import com.woernerj.dragonsdogma.bo.types.xml.S32;
-import com.woernerj.dragonsdogma.bo.types.xml.S8;
+import com.woernerj.dragonsdogma.bo.types.xml.ContainerType;
+import com.woernerj.dragonsdogma.bo.types.xml.NamedType;
+import com.woernerj.dragonsdogma.bo.types.xml.NumberType;
 import com.woernerj.dragonsdogma.bo.types.xml.Time;
-import com.woernerj.dragonsdogma.bo.types.xml.U16;
-import com.woernerj.dragonsdogma.bo.types.xml.U32;
-import com.woernerj.dragonsdogma.bo.types.xml.U64;
-import com.woernerj.dragonsdogma.bo.types.xml.U8;
 import com.woernerj.dragonsdogma.bo.types.xml.Vector3;
 
 public class SaveDataViewer extends JFrame {
@@ -44,8 +39,8 @@ public class SaveDataViewer extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTree jTree;
 	
-	public SaveDataViewer(Node node) {
-		TreeNode<Node> tree = getTree(node);
+	public SaveDataViewer(NamedType node) {
+		TreeNode<NamedType> tree = getTree(node);
 		DefaultMutableTreeNode jTreeNodes = getJTree(tree);
 		jTree = new JTree(jTreeNodes);
 		
@@ -64,56 +59,63 @@ public class SaveDataViewer extends JFrame {
 		return tree;
 	}
 	
-	private TreeNode<Node> getTree(Node node) {
-		TreeNode<Node> newTree = new TreeNode<>(node);
+	private TreeNode<NamedType> getTree(NamedType node) {
+		TreeNode<NamedType> newTree = new TreeNode<>(node);
 
-		NamedNodeMap attributes = node.getAttributes();
-		if (attributes == null) return null;
-		
 		newTree.setToStringHandler(n -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("(%s) ", node.getNodeName()));
-			for (int i = 0; i < attributes.getLength(); i++) {
-				Node attr = attributes.item(i);
-				sb.append(String.format("%s: %s", attr.getNodeName(), attr.getNodeValue()));
-				if (i < attributes.getLength()-1) {
-					sb.append(" - ");
-				}
+			sb.append(String.format("(%s) - ", n.getClass().getSimpleName()));
+			if (StringUtils.isNotBlank(n.getName())) {
+				sb.append(n.getName());
+			}
+			if (n instanceof NumberType) {
+				sb.append(String.format(" : %s", ((NumberType<?, ?>)n).getValue()));
+			} else if (n instanceof Array) {
+				Array<?> tmp = (Array<?>)n;
+				sb.append(String.format(" (type: %s", tmp.getType()))
+					.append(String.format(" count: %d)", tmp.getCount()));
+			} else if (n instanceof com.woernerj.dragonsdogma.bo.types.xml.Class) { 
+				sb.append(String.format(" : %s", ((com.woernerj.dragonsdogma.bo.types.xml.Class)n).getType()));
+			} else if (n instanceof ClassRef) {
+				sb.append(String.format(" : %s", ((com.woernerj.dragonsdogma.bo.types.xml.ClassRef)n).getType()));
+			} else if (n instanceof Bool) {
+				sb.append(String.format(" : %s", ((Bool)n).getValue()));
+			} else if (n instanceof Vector3) {
+				Vector3 tmp = (Vector3)n;
+				sb.append(String.format(" (x: %s", tmp.getX()))
+					.append(String.format(" y: %s", tmp.getY()))
+					.append(String.format(" z: %s)", tmp.getZ()));
+			} else if (n instanceof com.woernerj.dragonsdogma.bo.types.xml.String) {
+				sb.append(String.format(" : %s", ((com.woernerj.dragonsdogma.bo.types.xml.String)n).getValue()));
+			} else if (n instanceof Time) {
+				Time tmp = (Time)n;
+				String time = String.format(
+					" : %d/%d/%d %d:%d:%d",
+					tmp.getDay(), tmp.getMonth(), tmp.getYear(), tmp.getHour(), tmp.getMinute(), tmp.getSecond()
+				);
+				sb.append(time);
 			}
 			return sb.toString();
 		});
-		NodeList children = node.getChildNodes();
 		
-		for (int i = 0; i < children.getLength(); i++) {
-			TreeNode<Node> child = getTree(children.item(i));
-			if (child == null) continue;
-			newTree.addChild(child);
+		if (node instanceof ContainerType<?>) {
+			List<? extends NamedType> children = ((ContainerType<?>)node).getChildren();
+			for (NamedType child : children) {
+				newTree.addChild(getTree(child));
+			}
 		}
+		
 		return newTree;
 	}
 	
-	public static void main(String...args) throws ParserConfigurationException, FileNotFoundException, SAXException, IOException, XPathExpressionException {
+	public static void main(String...args) throws FileNotFoundException, SAXException, IOException, ParserConfigurationException {
 		File out = new File("output.xml");
-//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//		DocumentBuilder builder = factory.newDocumentBuilder();
-//		Document document = builder.parse(new InputSource(new FileInputStream(out)));
-//		SwingUtilities.invokeLater(() -> {
-//			new SaveDataViewer(document.getDocumentElement());
-//		});
-//
-//		PlayerData d = PlayerData.build(document);
-//		System.out.println(d);
 		
-		try {
-			JAXBContext context = JAXBContext.newInstance(U8.class, U16.class, U32.class, U64.class, S8.class, S16.class, S32.class, F32.class, Vector3.class, Time.class, com.woernerj.dragonsdogma.bo.types.xml.String.class, com.woernerj.dragonsdogma.bo.types.xml.Class.class, ClassRef.class, com.woernerj.dragonsdogma.bo.types.xml.Array.class);
-			Unmarshaller unmarshaller = context.createUnmarshaller();
-			com.woernerj.dragonsdogma.bo.types.xml.Class outObj = (com.woernerj.dragonsdogma.bo.types.xml.Class)unmarshaller.unmarshal(out);
-			
-			System.out.println(outObj);
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.parse(new InputSource(new FileInputStream(out)));
+		
+		PlayerData d = PlayerData.build(document);
+		System.out.println(d);
 	}
 }
