@@ -38,6 +38,7 @@ public class DDSaveLoaderTests {
 		File file = new File(fileLoc.getFile());
 		
 		DDSaveHeader result = null;
+		
 		try (FileInputStream input = new FileInputStream(file)) {
 			result = (DDSaveHeader) method.invoke(new DDSaveLoader(), new DataInputStream(input));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
