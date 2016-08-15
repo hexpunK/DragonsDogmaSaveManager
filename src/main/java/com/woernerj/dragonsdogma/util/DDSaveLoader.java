@@ -14,10 +14,10 @@ import com.woernerj.dragonsdogma.bo.types.DDPlatform;
 public class DDSaveLoader {
 
 	private static final Integer[] CONSTANTS = new Integer[] {
-			860693325,
-			0,
-			860700740,
-			1079398965
+			860693325, // What
+			0, // Do
+			860700740, // These
+			1079398965 // Do??!?
 	};
 	
 	public DDSaveHeader loadHeader(InputStream saveStream) {
@@ -26,8 +26,7 @@ public class DDSaveLoader {
 	
 	public DDSave loadSave(InputStream saveStream) {
 		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
-		parseSave(header, saveStream);
-		return new DDSave();
+		return DDSave.build(header, new String(parseSave(header, saveStream)));
 	}
 	
 	public String loadSaveAsXml(InputStream saveStream) {
@@ -83,7 +82,7 @@ public class DDSaveLoader {
 			return null;
 		}
 		
-		if (readBytes < 0) return null;
+		if (!readBytes.equals(header.getCompressedSize())) return null;
 		
 		return CompressionUtils.decompress(compressedData);
 	}

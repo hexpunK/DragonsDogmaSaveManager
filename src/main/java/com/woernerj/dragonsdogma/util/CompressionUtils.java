@@ -21,6 +21,7 @@ import com.woernerj.dragonsdogma.bo.CompressionProgressCallback;
  */
 public class CompressionUtils {
 
+	private static final int BUFFER_SIZE = 512;
 	/**
 	 * Compresses the specified data using the ZLib compression algorithm.
 	 * 
@@ -53,7 +54,7 @@ public class CompressionUtils {
 		
 		try (ByteArrayOutputStream out 
 				= new ByteArrayOutputStream(raw.length)){
-			byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[BUFFER_SIZE];
 			while (!deflater.finished()) {
 				double perc = (deflater.getBytesRead())/(double)raw.length;
 				out.write(buffer, 0, deflater.deflate(buffer));
@@ -69,7 +70,7 @@ public class CompressionUtils {
 	/**
 	 * Decompresses the specified data using the ZLib compression algorithm.
 	 * 
-	 * @param raw The data to be compressed as an array of bytes.
+	 * @param compressed The data to be compressed as an array of bytes.
 	 * @return An array of bytes containing the decompresses data.
 	 * @since 1.1
 	 */
@@ -81,7 +82,7 @@ public class CompressionUtils {
 	 * Allows the specification of a callback to report the progress of the 
 	 * decompression operation. 
 	 * 
-	 * @param raw The compressed data as an array of bytes.
+	 * @param compressed The compressed data as an array of bytes.
 	 * @param callback A callback that will report the progress of the 
 	 * decompression operation as an implementation of {@link 
 	 * CompressionProgressCallback}.
@@ -97,7 +98,7 @@ public class CompressionUtils {
 		
 		try (ByteArrayOutputStream out 
 				= new ByteArrayOutputStream(compressed.length)){
-			byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[BUFFER_SIZE];
 			while (inflater.getRemaining() > 0) {
 				float perc = inflater.getBytesRead()/(float)compressed.length;
 				out.write(buffer, 0, inflater.inflate(buffer));

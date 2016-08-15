@@ -12,4 +12,11 @@ public class DDSave {
 	public void setHeader(DDSaveHeader header) {
 		this.header = header;
 	}
+	
+	public static DDSave build(DDSaveHeader header, String inputXml) {
+		DDSave obj = new DDSave();
+		obj.setHeader(header);
+		
+		return obj;
+	}
 }
