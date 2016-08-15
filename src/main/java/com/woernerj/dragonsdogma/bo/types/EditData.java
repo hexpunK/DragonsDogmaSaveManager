@@ -1,5 +1,6 @@
 package com.woernerj.dragonsdogma.bo.types;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,14 @@ public class EditData {
 
 	private static final List<String> NICK_NAMES = new ArrayList<>();
 	static {		
-		InputStream strm = EditData.class.getResourceAsStream("/nicknames.txt");
-		if (strm == null) {
-			throw new NullPointerException("nicknames.txt could not be found");
-		}
-		try (Scanner reader = new Scanner(strm)) {
-			while (reader.hasNext()) {
-				NICK_NAMES.add(reader.nextLine());
+		try (InputStream strm = EditData.class.getResourceAsStream("/nicknames.txt")) {
+			try (Scanner reader = new Scanner(strm)) {
+				while (reader.hasNext()) {
+					NICK_NAMES.add(reader.nextLine());
+				}
 			}
+		} catch (IOException e) {
+			throw new RuntimeException("nicknames.txt could not be found");
 		}
 	}
 	
