@@ -28,14 +28,11 @@ public class PlayerData {
 	}
 	
 	public static PlayerData build(Node root) {
-		Node playerRoot = XPathUtils.findNode(root, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']");
-		if (playerRoot == null) {
-			return null;
-		}
-		
 		PlayerData obj = new PlayerData();
-		obj.setEditData(EditData.build(XPathUtils.findNode(playerRoot, "class[@name='mPl']")));
-		obj.setCharacterData(CharacterData.build(XPathUtils.findNode(playerRoot, "class[@name='mPl']")));
+		XPathUtils.findNode(root, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']/class[@name='mPl']").ifPresent(playerData -> {
+				obj.setEditData(EditData.build(playerData));
+				obj.setCharacterData(CharacterData.build(playerData));
+		});
 		return obj;
 	}
 }

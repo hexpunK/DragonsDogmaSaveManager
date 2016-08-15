@@ -3,10 +3,10 @@ package com.woernerj.dragonsdogma.bo.types;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.woernerj.dragonsdogma.util.XPathUtils;
 
@@ -57,23 +57,27 @@ public class EditData {
 	}
 	
 	public static EditData build(Node root) {
-		Node editDataNode = XPathUtils.findNode(root, "class[@name='mEdit']");
-		
-		Boolean gender = XPathUtils.getBoolean(editDataNode, "u8[@name='mGender']/@value");
-		
-		NodeList asciiNodes = XPathUtils.findNodes(editDataNode, "array[@name='(u8*)mNameStr']/child::u8");
-		byte[] strBytes = new byte[asciiNodes.getLength()];
-		for (int i = 0; i < asciiNodes.getLength(); i++) {
-			Double val = XPathUtils.getDouble(asciiNodes.item(i), "@value");
-			strBytes[i] = val.byteValue();
-		}
-		
-		Integer nicknameId = XPathUtils.getDouble(editDataNode, "u32[@name='mNickname']/@value").intValue();
-		
 		EditData obj = new EditData();
-		obj.setFemale(gender);
-		obj.setName(new String(strBytes).trim());
-		obj.setNicknameId(nicknameId);
+		
+		XPathUtils.findNode(root, "class[@name='mEdit']").ifPresent(node -> {
+			XPathUtils.getBoolean(node, "u8[@name='mGender']/@value").ifPresent(gender -> {
+				obj.setFemale(gender);
+			});
+			
+			XPathUtils.findNodes(node, "array[@name='(u8*)mNameStr']/child::u8").ifPresent(strNodes -> {
+				byte[] strBytes = new byte[strNodes.getLength()];
+				for (int i = 0; i < strNodes.getLength(); i++) {
+					Optional<Double> val = XPathUtils.getDouble(strNodes.item(i), "@value");
+					strBytes[i] = val.get().byteValue();
+				}
+				obj.setName(new String(strBytes).trim());
+			});
+			
+			XPathUtils.getDouble(node, "u32[@name='mNickname']/@value").ifPresent(id -> {
+				obj.setNicknameId(id.intValue());
+			});
+		});
+		
 		
 		return obj;
 	}

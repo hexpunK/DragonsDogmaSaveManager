@@ -8,7 +8,9 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -50,5 +52,29 @@ public class DDSaveLoaderTests {
 
 		assertNotNull("No header returned", result);
 		assertEquals("Header version was not DD:DA", DDVersion.DDDA, result.getDDVersion());
+	}
+	
+	@Test
+	public void testLoadAsXml() {
+		URL fileLoc = this.getClass().getClassLoader().getResource("ddda.sav");
+		if (fileLoc == null) fail("Could not get file location");
+		File file = new File(fileLoc.getFile());
+		
+		String result = null;
+		try (FileInputStream input = new FileInputStream(file)) {
+			result = new DDSaveLoader().loadSaveAsXml(input);
+		} catch (IOException e2) {
+			fail(String.format("Could not read save data\nReason: %s", e2.getMessage()));
+			return;
+		}
+		
+		assertNotNull(result);
+		File output = new File("output.xml");
+		try (PrintWriter printer = new PrintWriter(output)) {
+			printer.write(result);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

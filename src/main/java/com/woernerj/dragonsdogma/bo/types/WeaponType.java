@@ -15,8 +15,14 @@ public enum WeaponType {
 	WAND_DX("Archistave"),
 	;
 	
-	public final String name;
-	private WeaponType(String name) {
-		this.name = name;
+	public final String friendlyName;
+	
+	private WeaponType(String friendlyName) {
+		this.friendlyName = friendlyName;
+	}
+	
+	@Override
+	public String toString() {
+		return this.friendlyName;
 	}
 }

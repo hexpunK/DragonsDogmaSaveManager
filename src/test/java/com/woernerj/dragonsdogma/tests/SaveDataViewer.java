@@ -23,6 +23,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
+import com.woernerj.dragonsdogma.bo.types.PawnData;
 import com.woernerj.dragonsdogma.bo.types.PlayerData;
 
 public class SaveDataViewer extends JFrame {
@@ -83,11 +84,12 @@ public class SaveDataViewer extends JFrame {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.parse(new InputSource(new FileInputStream(out)));
-		SwingUtilities.invokeLater(() -> {
-			new SaveDataViewer(document.getDocumentElement());
-		});
-
-		PlayerData d = PlayerData.build(document);
+//		SwingUtilities.invokeLater(() -> {
+//			new SaveDataViewer(document.getDocumentElement());
+//		});
+//
+//		PlayerData d = PlayerData.build(document);
+		PawnData d = PawnData.build(document, 1);
 		System.out.println(d);
 	}
 }
