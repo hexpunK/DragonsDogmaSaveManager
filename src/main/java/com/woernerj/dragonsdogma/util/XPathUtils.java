@@ -113,8 +113,7 @@ public class XPathUtils {
 		XPathFactory factory = XPathFactory.newInstance();
 		XPath xPath = factory.newXPath();
 		try {
-			T result = (T)xPath.compile(expression).evaluate(root, type);
-			if (result != null) return Optional.of(result);
+			return Optional.ofNullable((T)xPath.compile(expression).evaluate(root, type));
 		} catch (XPathExpressionException e) {
 			LOG.error("Invalid XPath expression", e);
 		} catch (ClassCastException e2) {
