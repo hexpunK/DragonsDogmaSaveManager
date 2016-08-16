@@ -1,23 +1,29 @@
 package com.woernerj.dragonsdogma.bo.types;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+import org.w3c.dom.Node;
+
+import com.woernerj.dragonsdogma.util.XPathUtils;
 
 public class ItemData {
 
-	private static final Map<Short, String> ITEMS = new HashMap<>();
+	public static final ItemData EMPTY_ITEM = new ItemData();
+	private static final List<String> ITEMS = new ArrayList<>();
+	
 	static {
+		EMPTY_ITEM.setId((short)-1);
 		InputStream strm = ItemData.class.getResourceAsStream("/items.txt");
 		if (strm == null) {
-			throw new NullPointerException("nicknames.txt could not be found");
+			throw new NullPointerException("items.txt could not be found");
 		}
 		try (Scanner reader = new Scanner(strm)) {
 			while (reader.hasNext()) {
-				String line = reader.nextLine();
-				String[] parts = line.split(":");
-				ITEMS.put(Short.valueOf(parts[0]), parts[1]);
+				String name = reader.nextLine();
+				ITEMS.add(name);
 			}
 		}
 	}
@@ -25,7 +31,7 @@ public class ItemData {
 	private short id;
 	private short num;
 	private long flag;
-	private int changeNum;
+	private int chargeNum;
 	private int day1;
 	private int day2;
 	private int day3;
@@ -45,8 +51,8 @@ public class ItemData {
 	public long getFlag() {
 		return flag;
 	}
-	public int getChangeNum() {
-		return changeNum;
+	public int getChargeNum() {
+		return chargeNum;
 	}
 	public int getDay1() {
 		return day1;
@@ -75,8 +81,8 @@ public class ItemData {
 	public void setFlag(long flag) {
 		this.flag = flag;
 	}
-	public void setChangeNum(int changeNum) {
-		this.changeNum = changeNum;
+	public void setChargeNum(int chargeNum) {
+		this.chargeNum = chargeNum;
 	}
 	public void setDay1(int day1) {
 		this.day1 = day1;
@@ -95,5 +101,51 @@ public class ItemData {
 	}
 	public void setKey(long key) {
 		this.key = key;
+	}
+	
+	@Override
+	public String toString() {
+		if (this != ItemData.EMPTY_ITEM) {
+			return String.format("%s (x%d)", this.getItemName(), this.getNum());
+		} else {
+			return "EMPTY ITEM SLOT";
+		}
+	}
+	
+	public static ItemData build(Node root) {
+		ItemData obj = new ItemData();
+		
+		XPathUtils.getDouble(root, "s16[@name='data.mNum']/@value").ifPresent(mNum -> {
+			obj.setNum(mNum.shortValue());
+		});
+		XPathUtils.getDouble(root, "s16[@name='data.mItemNo']/@value").ifPresent(mItemNo -> {
+			obj.setId(mItemNo.shortValue());		
+		});
+		XPathUtils.getDouble(root, "u32[@name='data.mFlag']/@value").ifPresent(mFlag -> {
+			obj.setFlag(mFlag.longValue());
+		});
+		XPathUtils.getDouble(root, "u16[@name='data.mChgNum']/@value").ifPresent(mChgNum -> {
+			obj.setChargeNum(mChgNum.intValue());
+		});
+		XPathUtils.getDouble(root, "u16[@name='data.mDay1']/@value").ifPresent(mDay1 -> {
+			obj.setDay1(mDay1.intValue());
+		});
+		XPathUtils.getDouble(root, "u16[@name='data.mDay2']/@value").ifPresent(mDay2 -> {
+			obj.setDay2(mDay2.intValue());
+		});
+		XPathUtils.getDouble(root, "u16[@name='data.mDay3']/@value").ifPresent(mDay3 -> {
+			obj.setDay3(mDay3.intValue());
+		});
+		XPathUtils.getDouble(root, "s8[@name='data.mMutationPool']/@value").ifPresent(mMutationPool -> {
+			obj.setMutationPool(mMutationPool.byteValue());
+		});
+		XPathUtils.getDouble(root, "s8[@name='data.mOwnerId']/@value").ifPresent(mOwnerId -> {
+			obj.setOwnerId(mOwnerId.byteValue());
+		});
+		XPathUtils.getDouble(root, "u32[@name='data.mKey']/@value").ifPresent(mKey -> {
+			obj.setKey(mKey.longValue());
+		});
+		
+		return obj;
 	}
 }
