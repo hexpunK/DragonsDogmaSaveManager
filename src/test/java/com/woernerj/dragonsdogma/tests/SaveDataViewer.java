@@ -23,7 +23,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
+import com.woernerj.dragonsdogma.bo.types.Inventory;
 import com.woernerj.dragonsdogma.bo.types.PlayerData;
+import com.woernerj.dragonsdogma.util.XPathUtils;
 
 public class SaveDataViewer extends JFrame {
 	
@@ -83,11 +85,13 @@ public class SaveDataViewer extends JFrame {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.parse(new InputSource(new FileInputStream(out)));
-		SwingUtilities.invokeLater(() -> {
-			new SaveDataViewer(document.getDocumentElement());
-		});
+//		SwingUtilities.invokeLater(() -> {
+//			new SaveDataViewer(document.getDocumentElement());
+//		});
 
-		PlayerData d = PlayerData.build(document);
-		System.out.println(d);
+		Node rootNode = XPathUtils.findNode(document, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']").get();
+		//PlayerData d = PlayerData.build(document);
+		Inventory i = Inventory.build(rootNode);
+		System.out.println(i);
 	}
 }

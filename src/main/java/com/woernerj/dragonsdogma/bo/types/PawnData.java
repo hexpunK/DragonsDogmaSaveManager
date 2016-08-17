@@ -152,7 +152,7 @@ public class PawnData {
 	public static PawnData build(Node root, int pawnSlot) {
 		PawnData obj = PawnData.emptySlot();
 		
-		String xPath = String.format("//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']/array[@name='mCmc']/class[%d]", pawnSlot);
+		String xPath = String.format("array[@name='mCmc']/class[%d]", pawnSlot);
 		XPathUtils.findNode(root, xPath).ifPresent(pawnData -> {
 			obj.setExists(true);
 			obj.setEditData(EditData.build(pawnData));
