@@ -83,8 +83,8 @@ public class Inventory {
 	public static Inventory build(Node root) {
 		Inventory obj = new Inventory();
 		
-		XPathUtils.findNodes(root, "array[@name='mItem']/child::class").ifPresent(inventory -> {
-			final int arraySize = XPathUtils.getDouble(root, "array[@name='mItem']/@count").get().intValue();
+		XPathUtils.findNodes(root, "(//array[@name='mItem'])[1]/child::class").ifPresent(inventory -> {
+			final int arraySize = XPathUtils.getDouble(root, "(//array[@name='mItem'])[1]/@count").get().intValue();
 			List<InventoryBlock> blocks = new ArrayList<>(arraySize);
 			
 			for (int i = 0; i < arraySize; i++) {

@@ -33,7 +33,10 @@ public class DDSaveLoaderTests {
 		}
 		
 		@Override
-		public void loadCompleted(DDSave data) { saveData = data; }
+		public void loadCompleted(DDSave data) { 
+			saveData = data;
+			dataLoaded = true;
+		}
 		
 		@Override
 		public void onError(Throwable cause) {
@@ -43,6 +46,7 @@ public class DDSaveLoaderTests {
 	
 	private DDSaveLoader saveLoader;
 	private DDSave saveData;
+	private boolean dataLoaded;
 	
 	@Before
 	public void setup() {
@@ -70,6 +74,8 @@ public class DDSaveLoaderTests {
 		
 		try (FileInputStream file = new FileInputStream(fileLoc.getFile())) {
 			saveLoader.loadSave(file);
+			
+			while (!dataLoaded) { /* Spinnnnn */ }
 
 			assertNotNull("No save data returned", this.saveData);
 			assertNotNull("No header returned", this.saveData.getHeader());
