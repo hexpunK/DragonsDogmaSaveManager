@@ -8,7 +8,6 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +23,6 @@ import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
 import com.woernerj.dragonsdogma.bo.types.Inventory;
-import com.woernerj.dragonsdogma.bo.types.PlayerData;
 import com.woernerj.dragonsdogma.util.XPathUtils;
 
 public class SaveDataViewer extends JFrame {

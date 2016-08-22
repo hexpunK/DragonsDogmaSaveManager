@@ -10,14 +10,15 @@ import java.util.zip.Inflater;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.woernerj.dragonsdogma.bo.CompressionProgressCallback;
+import com.woernerj.dragonsdogma.exception.CompressionExpcetion;
 
 /**
  * A simple wrapper for Java ZIP utilities. Provides a neater way to compress 
  * and decompress data.
  * 
  * @author Jordan Woerner
- * @version 1.2
- * @since 2016-07-04
+ * @version 1.3
+ * @since 2016-08-21
  */
 public class CompressionUtils {
 
@@ -27,11 +28,14 @@ public class CompressionUtils {
 	 * 
 	 * @param raw The data to be compressed as an array of bytes.
 	 * @return An array of bytes containing the compressed data.
+	 * @throws CompressionExpcetion Thrown if no input data was provided or 
+	 * there was an IO error during compression.
 	 * @since 1.1
 	 */
-	public static byte[] compress(final byte[] raw) {
+	public static ByteArrayOutputStream compress(final byte[] raw) throws CompressionExpcetion {
 		return compress(raw, p -> { /* Do nothing */ });
 	}
+	
 	/**
 	 * Compresses the specified data using the ZLib compression algorithm. 
 	 * Allows the specification of a callback to report the progress of the 
@@ -42,18 +46,22 @@ public class CompressionUtils {
 	 * compression operation as an implementation of {@link 
 	 * CompressionProgressCallback}.
 	 * @return An array of bytes containing the compressed data.
+	 * @throws CompressionExpcetion Thrown if no input data was provided or 
+	 * there was an IO error during compression.
 	 * @since 1.0
 	 */
-	public static byte[] compress(final byte[] raw, 
-			final CompressionProgressCallback callback) {
-		if (ArrayUtils.isEmpty(raw)) return new byte[0];
+	public static ByteArrayOutputStream compress(final byte[] raw, 
+			final CompressionProgressCallback callback) 
+					throws CompressionExpcetion {
+		if (ArrayUtils.isEmpty(raw)) {
+			throw new CompressionExpcetion("Input data was empty");
+		}
 		
 		Deflater deflater = new Deflater();
 		deflater.setInput(raw);
 		deflater.finish();
 		
-		try (ByteArrayOutputStream out 
-				= new ByteArrayOutputStream(raw.length)){
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream(raw.length)){
 			byte[] buffer = new byte[BUFFER_SIZE];
 			while (!deflater.finished()) {
 				double perc = (deflater.getBytesRead())/(double)raw.length;
@@ -61,9 +69,9 @@ public class CompressionUtils {
 				callback.update(perc);
 			}
 			deflater.end();
-			return out.toByteArray();
+			return out;
 		} catch (IOException e) {
-			return null;
+			throw new CompressionExpcetion("Could not close input stream", e);
 		}
 	}
 
@@ -72,11 +80,15 @@ public class CompressionUtils {
 	 * 
 	 * @param compressed The data to be compressed as an array of bytes.
 	 * @return An array of bytes containing the decompresses data.
+	 * @throws CompressionExpcetion Thrown if no input data was provided or 
+	 * there was an IO error during compression.
 	 * @since 1.1
 	 */
-	public static byte[] decompress(final byte[] compressed) {
+	public static ByteArrayOutputStream decompress(final byte[] compressed) 
+			throws CompressionExpcetion {
 		return decompress(compressed, p -> { /* Do nothing */ });
 	}
+	
 	/**
 	 * Decompresses the specified data using the ZLib compression algorithm. 
 	 * Allows the specification of a callback to report the progress of the 
@@ -87,17 +99,21 @@ public class CompressionUtils {
 	 * decompression operation as an implementation of {@link 
 	 * CompressionProgressCallback}.
 	 * @return An array of bytes containing the raw data.
+	 * @throws CompressionExpcetion Thrown if no input data was provided or 
+	 * there was an IO error during compression.
 	 * @since 1.0
 	 */
-	public static byte[] decompress(final byte[] compressed, 
-			final CompressionProgressCallback callback) {
-		if (ArrayUtils.isEmpty(compressed)) return new byte[0];
+	public static ByteArrayOutputStream decompress(final byte[] compressed, 
+			final CompressionProgressCallback callback) 
+					throws CompressionExpcetion {
+		if (ArrayUtils.isEmpty(compressed)) {
+			throw new CompressionExpcetion("Input data was empty");
+		}
 		
 		Inflater inflater = new Inflater();
 		inflater.setInput(compressed);
 		
-		try (ByteArrayOutputStream out 
-				= new ByteArrayOutputStream(compressed.length)){
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream(compressed.length)){
 			byte[] buffer = new byte[BUFFER_SIZE];
 			while (inflater.getRemaining() > 0) {
 				float perc = inflater.getBytesRead()/(float)compressed.length;
@@ -105,9 +121,11 @@ public class CompressionUtils {
 				callback.update(perc);
 			}
 			inflater.end();
-			return out.toByteArray();
-		} catch (DataFormatException | IOException e) {
-			return null;
+			return out;
+		} catch (DataFormatException e) {
+			throw new CompressionExpcetion("Data format is not supported", e);
+		} catch (IOException e) {
+			throw new CompressionExpcetion("Could not close input stream", e);
 		}
 	}
 	

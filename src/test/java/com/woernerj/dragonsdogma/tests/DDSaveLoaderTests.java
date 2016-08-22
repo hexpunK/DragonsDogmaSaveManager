@@ -4,77 +4,94 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
 import com.woernerj.dragonsdogma.bo.DDVersion;
+import com.woernerj.dragonsdogma.bo.SaveDataCallback;
+import com.woernerj.dragonsdogma.exception.SaveLoadException;
 import com.woernerj.dragonsdogma.util.DDSaveLoader;
 
 public class DDSaveLoaderTests {
-
-	@Test
-	public void testLoadHeader()  {
-		Method method;
-		try {
-			method = DDSaveLoader.class.getDeclaredMethod("parseHeader", DataInput.class);
-		} catch (NoSuchMethodException | SecurityException e) {
-			fail("Could not find method 'parseHeader'");
-			return;
+	
+	private static final Logger LOG = LogManager.getLogger(DDSaveLoaderTests.class);
+	private final SaveDataCallback CALLBACK = new SaveDataCallback() {
+		public void progressChanged(Level logLevel, String message) {
+			LOG.log(logLevel, message);
 		}
-		method.setAccessible(true);
-
-		URL fileLoc = this.getClass().getClassLoader().getResource("ddda.sav");
-		if (fileLoc == null) fail("Could not get file location");
 		
-		File file = new File(fileLoc.getFile());
+		@Override
+		public void loadCompleted(DDSave data) { saveData = data; }
 		
-		DDSaveHeader result = null;
-		try (FileInputStream input = new FileInputStream(file)) {
-			result = (DDSaveHeader) method.invoke(new DDSaveLoader(), new DataInputStream(input));
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-			fail(String.format("Could not invoke 'parseHeader'\nReason: %s", e1.getMessage()));
-			return;
-		} catch (IOException e2) {
-			fail(String.format("Could not read save data\nReason: %s", e2.getMessage()));
-			return;
+		@Override
+		public void onError(Throwable cause) {
+			fail(cause.getMessage());
 		}
-
-		assertNotNull("No header returned", result);
-		assertEquals("Header version was not DD:DA", DDVersion.DDDA, result.getDDVersion());
+	};
+	
+	private DDSaveLoader saveLoader;
+	private DDSave saveData;
+	
+	@Before
+	public void setup() {
+		saveLoader = new DDSaveLoader();
+		saveLoader.setSaveDataCallback(CALLBACK);
 	}
 	
 	@Test
-	public void testLoadAsXml() {
+	public void testLoadHeader() throws FileNotFoundException, IOException, SaveLoadException  {
+		URL fileLoc = this.getClass().getClassLoader().getResource("ddda.sav");
+		if (fileLoc == null) fail("Could not get file location");
+		
+		try (FileInputStream file = new FileInputStream(fileLoc.getFile())) {
+			DDSaveHeader result = saveLoader.loadHeader(file);
+
+			assertNotNull("No header returned", result);
+			assertEquals("Header version was not DD:DA", DDVersion.DDDA, result.getDDVersion());
+		}
+	}
+	
+	@Test
+	public void testLoadSave() throws FileNotFoundException, IOException, SaveLoadException {
+		URL fileLoc = this.getClass().getClassLoader().getResource("ddda.sav");
+		if (fileLoc == null) fail("Could not get file location");
+		
+		try (FileInputStream file = new FileInputStream(fileLoc.getFile())) {
+			saveLoader.loadSave(file);
+
+			assertNotNull("No save data returned", this.saveData);
+			assertNotNull("No header returned", this.saveData.getHeader());
+			assertEquals("Header version was not DD:DA", DDVersion.DDDA, this.saveData.getHeader().getDDVersion());
+		}
+	}
+	
+	@Test
+	public void testLoadAsXml() throws SaveLoadException, IOException {
 		URL fileLoc = this.getClass().getClassLoader().getResource("ddda.sav");
 		if (fileLoc == null) fail("Could not get file location");
 		File file = new File(fileLoc.getFile());
 		
 		String result = null;
 		try (FileInputStream input = new FileInputStream(file)) {
-			result = new DDSaveLoader().loadSaveAsXml(input);
-		} catch (IOException e2) {
-			fail(String.format("Could not read save data\nReason: %s", e2.getMessage()));
-			return;
+			result = saveLoader.loadSaveAsXml(input);
 		}
 		
 		assertNotNull(result);
 		File output = new File("output.xml");
 		try (PrintWriter printer = new PrintWriter(output)) {
 			printer.write(result);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
