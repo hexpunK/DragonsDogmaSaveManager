@@ -30,8 +30,8 @@ public class PlayerData {
 	public static PlayerData build(Node root) {
 		PlayerData obj = new PlayerData();
 		XPathUtils.findNode(root, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']/class[@name='mPl']").ifPresent(playerData -> {
-				obj.setEditData(EditData.build(playerData));
-				obj.setCharacterData(CharacterData.build(playerData));
+			obj.setEditData(EditData.build(playerData));
+			obj.setCharacterData(CharacterData.build(playerData));
 		});
 		return obj;
 	}

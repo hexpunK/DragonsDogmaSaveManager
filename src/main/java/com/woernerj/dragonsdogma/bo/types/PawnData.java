@@ -87,6 +87,7 @@ public class PawnData {
 			
 			BehaviourData obj = new BehaviourData();
 			obj.setInfoType(behaviourType);
+			
 			XPathUtils.getDouble(root, String.format("f32[@name='%s.mValue']/@value", searchStr)).ifPresent(value -> {
 				obj.setValue(value.floatValue());
 			});
@@ -99,7 +100,7 @@ public class PawnData {
 		}
 	}
 	
-	private boolean exists;
+	private int pawnSlot;
 	private EditData editData;
 	private CharacterData characterData;
 	private int status;
@@ -109,8 +110,8 @@ public class PawnData {
 		this.behaviours = new HashMap<>();
 	}
 	
-	public boolean isExists() {
-		return exists;
+	public int getPawnSlot() {
+		return pawnSlot;
 	}
 	public EditData getEditData() {
 		return editData;
@@ -124,8 +125,8 @@ public class PawnData {
 	public Map<BehaviourType, BehaviourData> getBehaviours() {
 		return behaviours;
 	}
-	protected void setExists(boolean exists) {
-		this.exists = exists;
+	protected void setPawnSlot(int pawnSlot) {
+		this.pawnSlot = pawnSlot;
 	}
 	public void setEditData(EditData editData) {
 		this.editData = editData;
@@ -142,7 +143,7 @@ public class PawnData {
 	
 	@Override
 	public String toString() {
-		if (this.exists) {
+		if (this.pawnSlot != -1) {
 			return String.format("%s - %s", editData, characterData);
 		} else {
 			return "NO PAWN";
@@ -152,9 +153,9 @@ public class PawnData {
 	public static PawnData build(Node root, int pawnSlot) {
 		PawnData obj = PawnData.emptySlot();
 		
-		String xPath = String.format("array[@name='mCmc']/class[%d]", pawnSlot);
+		String xPath = String.format("//array[@name='mCmc']/class[%d]", pawnSlot);
 		XPathUtils.findNode(root, xPath).ifPresent(pawnData -> {
-			obj.setExists(true);
+			obj.setPawnSlot(pawnSlot);
 			obj.setEditData(EditData.build(pawnData));
 			obj.setCharacterData(CharacterData.build(pawnData));
 			
@@ -168,7 +169,7 @@ public class PawnData {
 	
 	protected static PawnData emptySlot() {
 		PawnData newPawn = new PawnData();
-		newPawn.setExists(false);
+		newPawn.setPawnSlot(-1);
 		return newPawn;
 	}
 }
