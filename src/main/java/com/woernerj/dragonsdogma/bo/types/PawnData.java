@@ -79,10 +79,10 @@ public class PawnData {
 			switch (behaviourType) {
 			case INFO_TYPE_EX_SKILL_USE:
 			case INFO_TYPE_EX_TALK:
-				searchStr = String.format("mInfoEx[%s]", behaviourType.name());
+				searchStr = String.format("mInfoEx[ %s ]", behaviourType.name());
 				break;
 			default:
-				searchStr = String.format("mInfo[%s]", behaviourType.name());
+				searchStr = String.format("mInfo[ %s ]", behaviourType.name());
 			}
 			
 			BehaviourData obj = new BehaviourData();
