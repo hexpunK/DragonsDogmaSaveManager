@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,8 +23,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.woernerj.dragonsdogma.bo.TreeNode;
-import com.woernerj.dragonsdogma.bo.types.Inventory;
-import com.woernerj.dragonsdogma.util.XPathUtils;
 
 public class SaveDataViewer extends JFrame {
 	
@@ -83,13 +82,13 @@ public class SaveDataViewer extends JFrame {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.parse(new InputSource(new FileInputStream(out)));
-//		SwingUtilities.invokeLater(() -> {
-//			new SaveDataViewer(document.getDocumentElement());
-//		});
+		SwingUtilities.invokeLater(() -> {
+			new SaveDataViewer(document.getDocumentElement());
+		});
 
-		Node rootNode = XPathUtils.findNode(document, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']").get();
-		//PlayerData d = PlayerData.build(document);
-		Inventory i = Inventory.build(rootNode);
-		System.out.println(i);
+//		Node rootNode = XPathUtils.findNode(document, "//class[@name='mPlayerDataManual']/class[@name='mPlCmcEditAndParam']").get();
+//		PlayerData d = PlayerData.build(document);
+//		Inventory i = Inventory.build(rootNode);
+//		System.out.println(i);
 	}
 }
