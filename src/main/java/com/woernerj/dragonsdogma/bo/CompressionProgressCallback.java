@@ -23,4 +23,8 @@ public interface CompressionProgressCallback {
 	 * @since 1.0
 	 */
 	public void update(double perc);
+	
+	default public void onCompressionError(Throwable cause) {
+		// Do nothing
+	}
 }

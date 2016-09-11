@@ -4,27 +4,10 @@ import org.w3c.dom.Node;
 
 import com.woernerj.dragonsdogma.util.XPathUtils;
 
-public class PlayerData {
-
-	private EditData editData;
-	private CharacterData characterData;
+public class PlayerData extends AbstractCharacterData {
 	
-	public EditData getEditData() {
-		return editData;
-	}
-	public CharacterData getCharacterData() {
-		return characterData;
-	}
-	public void setEditData(EditData editData) {
-		this.editData = editData;
-	}
-	public void setCharacterData(CharacterData characterData) {
-		this.characterData = characterData;
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("%s - %s", editData, characterData);
+	public PlayerData() {
+		super(false);
 	}
 	
 	public static PlayerData build(Node root) {

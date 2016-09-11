@@ -11,47 +11,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
 import com.woernerj.dragonsdogma.bo.DDVersion;
-import com.woernerj.dragonsdogma.bo.SaveDataCallback;
 import com.woernerj.dragonsdogma.exception.SaveLoadException;
 import com.woernerj.dragonsdogma.util.DDSaveLoader;
 
 public class DDSaveLoaderTests {
 	
-	private static final Logger LOG = LogManager.getLogger(DDSaveLoaderTests.class);
-	private final SaveDataCallback CALLBACK = new SaveDataCallback() {
-		public void progressChanged(Level logLevel, String message) {
-			LOG.log(logLevel, message);
-		}
-		
-		@Override
-		public void loadCompleted(DDSave data) { 
-			saveData = data;
-			dataLoaded = true;
-		}
-		
-		@Override
-		public void onError(Throwable cause) {
-			fail(cause.getMessage());
-		}
-	};
-	
 	private DDSaveLoader saveLoader;
 	private DDSave saveData;
-	private boolean dataLoaded;
 	
 	@Before
 	public void setup() {
 		saveLoader = new DDSaveLoader();
-		saveLoader.setSaveDataCallback(CALLBACK);
+		saveLoader.setSaveDataCallback(data -> saveData = data );
 	}
 	
 	@Test
@@ -60,7 +37,7 @@ public class DDSaveLoaderTests {
 		if (fileLoc == null) fail("Could not get file location");
 		
 		try (FileInputStream file = new FileInputStream(fileLoc.getFile())) {
-			DDSaveHeader result = saveLoader.loadHeader(file);
+			DDSaveHeader result = saveLoader.loadHeader(file).orElseGet(null);
 
 			assertNotNull("No header returned", result);
 			assertEquals("Header version was not DD:DA", DDVersion.DDDA, result.getDDVersion());
@@ -74,12 +51,10 @@ public class DDSaveLoaderTests {
 		
 		try (FileInputStream file = new FileInputStream(fileLoc.getFile())) {
 			saveLoader.loadSave(file);
-			
-			while (!dataLoaded) { /* Spinnnnn */ }
 
-			assertNotNull("No save data returned", this.saveData);
-			assertNotNull("No header returned", this.saveData.getHeader());
-			assertEquals("Header version was not DD:DA", DDVersion.DDDA, this.saveData.getHeader().getDDVersion());
+			assertNotNull("No save data returned", saveData);
+			assertNotNull("No header returned", saveData.getHeader());
+			assertEquals("Header version was not DD:DA", DDVersion.DDDA, saveData.getHeader().getDDVersion());
 		}
 	}
 	
@@ -91,7 +66,7 @@ public class DDSaveLoaderTests {
 		
 		String result = null;
 		try (FileInputStream input = new FileInputStream(file)) {
-			result = saveLoader.loadSaveAsXml(input);
+			result = saveLoader.loadSaveAsXml(input).orElseGet(null);
 		}
 		
 		assertNotNull(result);

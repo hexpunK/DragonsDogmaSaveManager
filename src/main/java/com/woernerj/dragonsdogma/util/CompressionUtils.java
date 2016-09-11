@@ -32,7 +32,7 @@ public class CompressionUtils {
 	 * there was an IO error during compression.
 	 * @since 1.1
 	 */
-	public static ByteArrayOutputStream compress(final byte[] raw) throws CompressionExpcetion {
+	public static ByteArrayOutputStream compress(final byte[] raw) {
 		return compress(raw, p -> { /* Do nothing */ });
 	}
 	
@@ -51,10 +51,10 @@ public class CompressionUtils {
 	 * @since 1.0
 	 */
 	public static ByteArrayOutputStream compress(final byte[] raw, 
-			final CompressionProgressCallback callback) 
-					throws CompressionExpcetion {
+			final CompressionProgressCallback callback) {
 		if (ArrayUtils.isEmpty(raw)) {
-			throw new CompressionExpcetion("Input data was empty");
+			callback.onCompressionError(new CompressionExpcetion("Input data was empty"));
+			return null;
 		}
 		
 		Deflater deflater = new Deflater();
@@ -71,8 +71,10 @@ public class CompressionUtils {
 			deflater.end();
 			return out;
 		} catch (IOException e) {
-			throw new CompressionExpcetion("Could not close input stream", e);
+			callback.onCompressionError(new CompressionExpcetion("Could not close input stream", e));
 		}
+		
+		return null;
 	}
 
 	/**
@@ -84,8 +86,7 @@ public class CompressionUtils {
 	 * there was an IO error during compression.
 	 * @since 1.1
 	 */
-	public static ByteArrayOutputStream decompress(final byte[] compressed) 
-			throws CompressionExpcetion {
+	public static ByteArrayOutputStream decompress(final byte[] compressed) {
 		return decompress(compressed, p -> { /* Do nothing */ });
 	}
 	
@@ -104,10 +105,10 @@ public class CompressionUtils {
 	 * @since 1.0
 	 */
 	public static ByteArrayOutputStream decompress(final byte[] compressed, 
-			final CompressionProgressCallback callback) 
-					throws CompressionExpcetion {
+			final CompressionProgressCallback callback) {
 		if (ArrayUtils.isEmpty(compressed)) {
-			throw new CompressionExpcetion("Input data was empty");
+			callback.onCompressionError(new CompressionExpcetion("Input data was empty"));
+			return null;
 		}
 		
 		Inflater inflater = new Inflater();
@@ -123,10 +124,12 @@ public class CompressionUtils {
 			inflater.end();
 			return out;
 		} catch (DataFormatException e) {
-			throw new CompressionExpcetion("Data format is not supported", e);
+			callback.onCompressionError(new CompressionExpcetion("Data format is not supported", e));
 		} catch (IOException e) {
-			throw new CompressionExpcetion("Could not close input stream", e);
+			callback.onCompressionError(new CompressionExpcetion("Could not close input stream", e));
 		}
+		
+		return null;
 	}
 	
 	/**

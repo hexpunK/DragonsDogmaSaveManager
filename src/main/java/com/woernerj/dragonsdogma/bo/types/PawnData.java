@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 
 import com.woernerj.dragonsdogma.util.XPathUtils;
 
-public class PawnData {
+public class PawnData extends AbstractCharacterData {
 
 	public static enum BehaviourType {
 		INFO_TYPE_BELLIGERENT(0, true),
@@ -101,26 +101,15 @@ public class PawnData {
 	}
 	
 	private int pawnSlot;
-	private EditData editData;
-	private CharacterData characterData;
-	private int status;
 	private Map<BehaviourType, BehaviourData> behaviours;
 	
 	public PawnData() {
+		super(true);
 		this.behaviours = new HashMap<>();
 	}
 	
 	public int getPawnSlot() {
 		return pawnSlot;
-	}
-	public EditData getEditData() {
-		return editData;
-	}
-	public CharacterData getCharacterData() {
-		return characterData;
-	}
-	public int getStatus() {
-		return status;
 	}
 	public Map<BehaviourType, BehaviourData> getBehaviours() {
 		return behaviours;
@@ -128,26 +117,8 @@ public class PawnData {
 	protected void setPawnSlot(int pawnSlot) {
 		this.pawnSlot = pawnSlot;
 	}
-	public void setEditData(EditData editData) {
-		this.editData = editData;
-	}
-	public void setCharacterData(CharacterData characterData) {
-		this.characterData = characterData;
-	}
-	public void setStatus(int status) {
-		this.status = status;
-	}
 	public void setBehaviour(BehaviourType behaviourType, BehaviourData behaviourData) {
 		this.behaviours.put(behaviourType, behaviourData);
-	}
-	
-	@Override
-	public String toString() {
-		if (this.pawnSlot != -1) {
-			return String.format("%s - %s", editData, characterData);
-		} else {
-			return "NO PAWN";
-		}
 	}
 	
 	public static PawnData build(Node root, int pawnSlot) {

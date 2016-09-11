@@ -33,7 +33,7 @@ public interface SaveDataCallback {
 	
 	/**
 	 * Called when the file has finished loading. If there is an error during 
-	 * loading and {@link SaveDataCallback#onError(Throwable)} is called, this 
+	 * loading and {@link SaveDataCallback#onCompressionError(Throwable)} is called, this 
 	 * will normally not be called as well.
 	 * 
 	 * @param data The {@link DDSave} containing the loaded save data.
@@ -48,7 +48,7 @@ public interface SaveDataCallback {
 	 * sub-class of {@link Throwable}.
 	 * @since 1.0
 	 */
-	default public void onError(Throwable cause) {
+	default public void onCompressionError(Throwable cause) {
 		/* Do nothing by default */
 	}
 }

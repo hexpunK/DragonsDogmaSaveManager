@@ -21,6 +21,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -57,8 +58,8 @@ public class SteamAccountManager {
 	 * nickname as a {@link String}.
 	 * @since 1.0
 	 */
-	public Map<Integer, String> getSteamAccounts() {
-		Optional<File> steamDir = openSteamFolder();
+	public Map<String, Integer> getSteamAccounts() {
+		Optional<File> steamDir = findSteamFolder();
 		if (steamDir.isPresent()) {
 			return getSteamUsers(steamDir.get().listFiles(FILTER)[0]);
 		}
@@ -92,37 +93,48 @@ public class SteamAccountManager {
 		return this.steamPath;
 	}
 	
-	private Optional<File> openSteamFolder() {
-		ProcessBuilder builder = new ProcessBuilder("reg", "query", "HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam");
-		Process proc = null;
-		Optional<String> str = Optional.empty();
-		try {
-			proc = builder.start();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
-				 str = reader.lines()
-						 .filter(l -> l.contains("SteamPath"))
-						 .findFirst();
-			}
-		} catch (IOException e) {
-			LOG.error("Error reading output of REG", e);
-			return Optional.empty();
-		} finally {
-			if (proc != null) {
-				try {
-					proc.waitFor();
-				} catch (InterruptedException e) {
-					LOG.error("REG process was interrupted", e);
-					proc = null;
+	private Optional<File> findSteamFolder() {
+		Preferences prefs = Preferences.userNodeForPackage(DragonsDogmaSaveManager.class);
+		this.steamPath = prefs.get("steamlocation", null);
+		 
+		if (StringUtils.isBlank(steamPath)) {
+			ProcessBuilder builder = new ProcessBuilder("reg", "query", "HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam");
+			Process proc = null;
+			Optional<String> str = Optional.empty();
+			try {
+				proc = builder.start();
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+					 str = reader.lines()
+							 .filter(l -> l.contains("SteamPath"))
+							 .findFirst();
+				}
+			} catch (IOException e) {
+				LOG.error("Error reading output of REG", e);
+				return Optional.empty();
+			} finally {
+				if (proc != null) {
+					try {
+						proc.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("REG process was interrupted", e);
+						proc = null;
+					}
 				}
 			}
+			if (str.isPresent()) {
+				String regStr = "REG_SZ";
+				int regPos = str.get().indexOf(regStr)+regStr.length();
+				this.steamPath = str.get().substring(regPos).trim();
+			}
 		}
-		if (str.isPresent()) {
-			String regStr = "REG_SZ";
-			int regPos = str.get().indexOf(regStr)+regStr.length();
-			String steamPath = str.get().substring(regPos).trim();
-			return Optional.of(new File(steamPath));
+
+		try {
+			prefs.put("steamlocation", this.steamPath);
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			LOG.warn("Failed to save perferences", e);
 		}
-		return Optional.empty();
+		return Optional.ofNullable(new File(this.steamPath));
 	}
 	
 	private Optional<File> requestSteamFolder() {
@@ -135,18 +147,17 @@ public class SteamAccountManager {
 		return Optional.ofNullable(filePicker.getSelectedFile());
 	}
 	
-	private Map<Integer, String> getSteamUsers(final File steamDir) {
-		if (!steamDir.exists() || steamDir.listFiles(FILTER).length <= 0) {
+	private Map<String, Integer> getSteamUsers(final File steamDir) {
+		if (!steamDir.exists()) {
 			// Break out early if we don't have the right directory.
 			return Collections.emptyMap();
 		}
 		
-		setSteamPath(steamDir.getAbsolutePath());
 		final String[] userFolders = steamDir.list(DirectoryFileFilter.DIRECTORY);
 		final Preferences prefs = Preferences.userNodeForPackage(DragonsDogmaSaveManager.class);
 		final Preferences accountNodeprefs = prefs.node("accounts");
 		
-		Map<Integer, String> userAccounts = new HashMap<>();
+		Map<String, Integer> userAccounts = new HashMap<>();
 		for (String userId : userFolders) {
 			try {
 				final Integer userIdInt = Integer.valueOf(userId);
@@ -154,12 +165,12 @@ public class SteamAccountManager {
 				if (nickName == null) {
 					// No cache for this user, find it and cache it.
 					performNicknameLookup(userId).ifPresent(name -> {
-						userAccounts.put(userIdInt, name);
+						userAccounts.put(name, userIdInt);
 						accountNodeprefs.put(userId, name);
 					});
 				} else {
 					// Cached in Preferences. Noice.
-					userAccounts.put(userIdInt, nickName);
+					userAccounts.put(nickName, userIdInt);
 				}
 			} catch (NumberFormatException ex) {
 				continue; // Not even a user ID.

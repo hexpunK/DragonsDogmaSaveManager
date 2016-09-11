@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,7 +23,6 @@ import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
 import com.woernerj.dragonsdogma.bo.SaveDataCallback;
 import com.woernerj.dragonsdogma.bo.types.DDPlatform;
-import com.woernerj.dragonsdogma.exception.CompressionExpcetion;
 import com.woernerj.dragonsdogma.exception.SaveLoadException;
 
 public class DDSaveLoader {
@@ -48,66 +48,43 @@ public class DDSaveLoader {
 		this.compressionCallback = callback;
 	}
 	
-	public DDSaveHeader loadHeader(InputStream saveStream) 
-			throws SaveLoadException {
+	public Optional<DDSaveHeader> loadHeader(InputStream saveStream) {
 		return parseHeader(new DataInputStream(saveStream));
 	}
 	
 	public void loadSave(InputStream saveStream) {
-		saveDataCallback.loadStarted();
-		DDSaveHeader header;
-		try {
-			header = parseHeader(new DataInputStream(saveStream));
-		} catch (SaveLoadException e) {
-			saveDataCallback.onError(e);
-			return;
-		}
-		
-		DDSave saveData = null;
-		try (ByteArrayInputStream bytes = new ByteArrayInputStream(parseSave(header, saveStream).toByteArray())) {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.parse(bytes);
-			
-			saveData = DDSave.build(header, document, saveDataCallback);
-		} catch (ParserConfigurationException e) {
-			saveDataCallback.onError(new SaveLoadException("Could not create XML parser", e));
-			return;
-		} catch (SAXException e) {
-			saveDataCallback.onError(new SaveLoadException("Could not parse XML", e));
-			return;
-		} catch (IOException e) {
-			saveDataCallback.onError(new SaveLoadException("Could not read save data", e));
-			return;
-		} catch (CompressionExpcetion e) {
-			saveDataCallback.onError(new SaveLoadException("Failed to decompress save data", e));
-			return;
-		} catch (SaveLoadException e) {
-			saveDataCallback.onError(e);
-			return;
-		}
-		saveDataCallback.loadCompleted(saveData);
+		parseHeader(new DataInputStream(saveStream)).ifPresent(header -> {
+			try (ByteArrayInputStream bytes = new ByteArrayInputStream(parseSave(header, saveStream).toByteArray())) {
+				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder builder = factory.newDocumentBuilder();
+				Document document = builder.parse(bytes);
+				
+				DDSave.build(header, document, saveDataCallback);
+			} catch (ParserConfigurationException e) {
+				saveDataCallback.onCompressionError(new SaveLoadException("Could not create XML parser", e));
+			} catch (SAXException e) {
+				saveDataCallback.onCompressionError(new SaveLoadException("Could not parse XML", e));
+			} catch (IOException e) {
+				saveDataCallback.onCompressionError(new SaveLoadException("Could not read save data", e));
+			}
+		});
 	}
 	
-	public String loadSaveAsXml(InputStream saveStream) 
-			throws SaveLoadException {
-		DDSaveHeader header = parseHeader(new DataInputStream(saveStream));
-		try {
-			return new String(parseSave(header, saveStream).toByteArray());
-		} catch (CompressionExpcetion e) {
-			throw new SaveLoadException("Failed to decompress save data", e);
-		}
+	public Optional<String> loadSaveAsXml(InputStream saveStream) {
+		return parseHeader(new DataInputStream(saveStream)).flatMap(header -> {
+			return Optional.ofNullable(new String(parseSave(header, saveStream).toByteArray()));
+		});
 	}
 	
-	private DDSaveHeader parseHeader(DataInput saveStream) 
-			throws SaveLoadException {
+	private Optional<DDSaveHeader> parseHeader(DataInput saveStream) {
 		ByteBuffer buffer = ByteBuffer.allocate(DDSaveHeader.HEADER_BYTES);
 		byte[] data = new byte[DDSaveHeader.HEADER_BYTES];
 		
 		try {
 			saveStream.readFully(data);
 		} catch (IOException e) {
-			throw new SaveLoadException("Could not read save data file", e);
+			saveDataCallback.onCompressionError(new SaveLoadException("Could not read save data file", e));
+			return Optional.empty();
 		}
 		
 		byte[] testByte = new byte[] {
@@ -131,17 +108,17 @@ public class DDSaveLoader {
 		Integer checksum = buffer.getInt(24);
 		
 		if (!Arrays.deepEquals(headerConstants, CONSTANTS)) {
-			throw new SaveLoadException("Header constants did not match expected constants");
+			saveDataCallback.onCompressionError(new SaveLoadException("Header constants did not match expected constants"));
+			return Optional.empty();
 		}
 		
 		DDSaveHeader header = new DDSaveHeader(platform, version, size, compressedSize, checksum);
-		return header;
+		return Optional.ofNullable(header);
 	}
 	
-	private ByteArrayOutputStream parseSave(DDSaveHeader header, InputStream saveStream)
-			throws CompressionExpcetion, SaveLoadException {
+	private ByteArrayOutputStream parseSave(DDSaveHeader header, InputStream saveStream) {
 		if (header == null) {
-			throw new SaveLoadException("A header must be provided to load save data");
+			saveDataCallback.onCompressionError(new SaveLoadException("A header must be provided to load save data"));
 		}
 		
 		byte[] compressedData = new byte[header.getCompressedSize()];
@@ -150,11 +127,11 @@ public class DDSaveLoader {
 		try {
 			readBytes = saveStream.read(compressedData, 0, length);
 		} catch (IOException e) {
-			throw new SaveLoadException("Error reading save data", e);
+			saveDataCallback.onCompressionError(new SaveLoadException("Error reading save data", e));
 		}
 		
 		if (!readBytes.equals(header.getCompressedSize())) {
-			throw new SaveLoadException("Decompressed save data was an unexpected size");
+			saveDataCallback.onCompressionError(new SaveLoadException("Decompressed save data was an unexpected size"));
 		}
 		
 		return CompressionUtils.decompress(compressedData, compressionCallback);
