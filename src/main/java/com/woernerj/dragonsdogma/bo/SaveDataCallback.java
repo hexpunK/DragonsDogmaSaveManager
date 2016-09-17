@@ -48,7 +48,7 @@ public interface SaveDataCallback {
 	 * sub-class of {@link Throwable}.
 	 * @since 1.0
 	 */
-	default public void onCompressionError(Throwable cause) {
+	default public void error(Throwable cause) {
 		/* Do nothing by default */
 	}
 }
