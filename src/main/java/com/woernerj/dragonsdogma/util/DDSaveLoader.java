@@ -4,8 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Optional;
@@ -13,11 +18,18 @@ import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.Level;
+import org.codehaus.stax2.XMLStreamReader2;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.aalto.AsyncXMLInputFactory;
+import com.fasterxml.aalto.stax.InputFactoryImpl;
 import com.woernerj.dragonsdogma.bo.CompressionProgressCallback;
 import com.woernerj.dragonsdogma.bo.DDSave;
 import com.woernerj.dragonsdogma.bo.DDSaveHeader;
@@ -56,20 +68,46 @@ public class DDSaveLoader {
 		try (DataInputStream strm = new DataInputStream(saveStream)) {
 			parseHeader(strm).ifPresent(header -> {
 				try (ByteArrayInputStream bytes = new ByteArrayInputStream(parseSave(header, saveStream).toByteArray())) {
-					Document document = getDocumentBuilder().parse(bytes);
+					AsyncXMLInputFactory factory = new InputFactoryImpl();
+					factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+					factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+					factory.setProperty(XMLInputFactory.IS_COALESCING, false);
+					factory.configureForLowMemUsage();
+
+					XMLStreamReader2  reader = (XMLStreamReader2)factory.createXMLStreamReader("DDDA", bytes);
 					
-					DDSave.build(header, document, saveDataCallback);
-				} catch (SAXException e) {
-					saveDataCallback.error(new SaveLoadException("Could not parse XML", e));
+					Writer stringWriter = new StringWriter();
+					DDSaxParser handler = new DDSaxParser(reader, stringWriter);
+					handler.parse();
+					
+					stringWriter.close();
+					
+					IOUtils.write(handler.toString(), new FileOutputStream("tmp.txt"));
+					
+					InputSource in = new InputSource(new StringReader(handler.toString()));
+					Document doc = getDocumentBuilder().parse(in);
+					saveDataCallback.loadCompleted(DDSave.build(header, doc));
+				} catch (XMLStreamException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (IOException e) {
-					saveDataCallback.error(new SaveLoadException("Could not read save data", e));
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SAXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (SaveLoadException e) {
-					saveDataCallback.error(new SaveLoadException(e.getMessage(), e.getCause()));
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			});
-		} catch (IOException e) {
-			saveDataCallback.error(new SaveLoadException("Could not close file"));
-		};
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
 	public Optional<String> loadSaveAsXml(InputStream saveStream) 
